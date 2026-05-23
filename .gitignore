@@ -1,0 +1,28 @@
+## Ignore Visual Studio temporary files, build results, and user settings
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+bld/
+[Bb]in/
+[Oo]bj/
+[L]og/
+[Log]s/
+.vs/
+.vscode/
+
+## NuGet Packages
+packages/
+*.nuget.props
+*.nuget.targets
+
+## User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## Windows system files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
