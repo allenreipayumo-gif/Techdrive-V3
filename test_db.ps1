@@ -1,4 +1,4 @@
-Add-Type -Path "c:\Users\Johnrome\Desktop\techdrive\Techdrive-App-main\Techdrive-App-main\TechdriveLogin\bin\Debug\Npgsql.dll"
+Add-Type -Path "$PSScriptRoot\TechdriveLogin\bin\Debug\Npgsql.dll"
 $connString = "Host=nordic-coyote-16113.jxf.gcp-asia-southeast1.cockroachlabs.cloud;Port=26257;Database=defaultdb;Username=rome;Password=j6fSYFN3UndFa7-smeTaKg;SSL Mode=Require;"
 $conn = New-Object Npgsql.NpgsqlConnection($connString)
 try {

@@ -1,4 +1,4 @@
-﻿namespace TechdriveLogin
+namespace TechdriveLogin
 {
     partial class bookAvehicle
     {
@@ -62,6 +62,8 @@
             this.addressTb = new System.Windows.Forms.TextBox();
             this.nameTb = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
+            this.paymentsTb = new System.Windows.Forms.TextBox();
+            this.lblPayments = new System.Windows.Forms.Label();
             this.panel7.SuspendLayout();
             this.panel9.SuspendLayout();
             this.panelAvailableVehicles.SuspendLayout();
@@ -342,6 +344,8 @@
             this.panel10.Controls.Add(this.addressTb);
             this.panel10.Controls.Add(this.nameTb);
             this.panel10.Controls.Add(this.label3);
+            this.panel10.Controls.Add(this.paymentsTb);
+            this.panel10.Controls.Add(this.lblPayments);
             this.panel10.Location = new System.Drawing.Point(25, 23);
             this.panel10.Name = "panel10";
             this.panel10.Size = new System.Drawing.Size(417, 470);
@@ -413,7 +417,7 @@
             this.label9.AutoSize = true;
             this.label9.Font = new System.Drawing.Font("Century Gothic", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label9.ForeColor = System.Drawing.Color.White;
-            this.label9.Location = new System.Drawing.Point(129, 318);
+            this.label9.Location = new System.Drawing.Point(129, 258);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(176, 25);
             this.label9.TabIndex = 23;
@@ -424,7 +428,7 @@
             this.label8.AutoSize = true;
             this.label8.Font = new System.Drawing.Font("Century Gothic", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label8.ForeColor = System.Drawing.Color.White;
-            this.label8.Location = new System.Drawing.Point(125, 242);
+            this.label8.Location = new System.Drawing.Point(125, 198);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(182, 25);
             this.label8.TabIndex = 22;
@@ -435,27 +439,39 @@
             this.label6.AutoSize = true;
             this.label6.Font = new System.Drawing.Font("Century Gothic", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label6.ForeColor = System.Drawing.Color.White;
-            this.label6.Location = new System.Drawing.Point(165, 169);
+            this.label6.Location = new System.Drawing.Point(165, 138);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(94, 25);
             this.label6.TabIndex = 21;
             this.label6.Text = "Address";
+            // 
+            // lblPayments
+            // 
+            this.lblPayments.AutoSize = true;
+            this.lblPayments.Font = new System.Drawing.Font("Century Gothic", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblPayments.ForeColor = System.Drawing.Color.White;
+            this.lblPayments.Location = new System.Drawing.Point(105, 318);
+            this.lblPayments.Name = "lblPayments";
+            this.lblPayments.Size = new System.Drawing.Size(206, 25);
+            this.lblPayments.TabIndex = 24;
+            this.lblPayments.Text = "Payment Reference";
             // 
             // label5
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Century Gothic", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label5.ForeColor = System.Drawing.Color.White;
-            this.label5.Location = new System.Drawing.Point(174, 93);
+            this.label5.Location = new System.Drawing.Point(174, 78);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(75, 25);
             this.label5.TabIndex = 20;
             this.label5.Text = "Name";
             // 
+            // 
             // lcnsenumTb
             // 
             this.lcnsenumTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lcnsenumTb.Location = new System.Drawing.Point(60, 289);
+            this.lcnsenumTb.Location = new System.Drawing.Point(60, 230);
             this.lcnsenumTb.Name = "lcnsenumTb";
             this.lcnsenumTb.Size = new System.Drawing.Size(300, 26);
             this.lcnsenumTb.TabIndex = 19;
@@ -463,7 +479,7 @@
             // cntctnumTb
             // 
             this.cntctnumTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cntctnumTb.Location = new System.Drawing.Point(60, 213);
+            this.cntctnumTb.Location = new System.Drawing.Point(60, 170);
             this.cntctnumTb.Name = "cntctnumTb";
             this.cntctnumTb.Size = new System.Drawing.Size(300, 26);
             this.cntctnumTb.TabIndex = 18;
@@ -471,7 +487,7 @@
             // addressTb
             // 
             this.addressTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.addressTb.Location = new System.Drawing.Point(60, 137);
+            this.addressTb.Location = new System.Drawing.Point(60, 110);
             this.addressTb.Name = "addressTb";
             this.addressTb.Size = new System.Drawing.Size(300, 26);
             this.addressTb.TabIndex = 17;
@@ -479,10 +495,18 @@
             // nameTb
             // 
             this.nameTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nameTb.Location = new System.Drawing.Point(60, 64);
+            this.nameTb.Location = new System.Drawing.Point(60, 50);
             this.nameTb.Name = "nameTb";
             this.nameTb.Size = new System.Drawing.Size(300, 26);
             this.nameTb.TabIndex = 16;
+            // 
+            // paymentsTb
+            // 
+            this.paymentsTb.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.paymentsTb.Location = new System.Drawing.Point(60, 290);
+            this.paymentsTb.Name = "paymentsTb";
+            this.paymentsTb.Size = new System.Drawing.Size(300, 26);
+            this.paymentsTb.TabIndex = 20;
             // 
             // label3
             // 
@@ -557,5 +581,7 @@
         private System.Windows.Forms.DateTimePicker datePicker;
         private System.Windows.Forms.Button draftBtn;
         private System.Windows.Forms.Button discardBtn;
+        private System.Windows.Forms.TextBox paymentsTb;
+        private System.Windows.Forms.Label lblPayments;
     }
 }

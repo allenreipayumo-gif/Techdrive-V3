@@ -26,3 +26,7 @@ packages/
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+
+# Techdrive local scratch and test emails
+scratch/
+sent_emails/

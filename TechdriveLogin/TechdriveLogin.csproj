@@ -97,6 +97,16 @@
       <DependentUpon>Reports.cs</DependentUpon>
     </Compile>
     <Compile Include="tdLogin\DatabaseHelper.cs" />
+    <Compile Include="tdLogin\EmailHelper.cs" />
+    <Compile Include="tdLogin\MaintenanceAlertsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="tdLogin\LoadingForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="tdLogin\AddVehicleForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="tdLogin\Form1.cs">
       <SubType>Form</SubType>
     </Compile>

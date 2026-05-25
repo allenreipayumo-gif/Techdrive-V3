@@ -19,18 +19,15 @@ namespace TechdriveLogin
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            // Remember Me: restore saved username if it was checked before
-            if (Properties.Settings.Default.RememberMe)
+            if (this.cbRemeber != null)
             {
-                tbUsername.Text = Properties.Settings.Default.SavedUsername;
-                cbRemeber.Checked = true;
-                // Move focus to password since username is prefilled
-                tbPassword.Focus();
+                this.cbRemeber.Visible = false;
+                this.cbRemeber.Checked = false;
             }
-            else
-            {
-                tbUsername.Focus();
-            }
+            Properties.Settings.Default.RememberMe = false;
+            Properties.Settings.Default.SavedUsername = "";
+            Properties.Settings.Default.Save();
+            tbUsername.Focus();
         }
 
         private void btnLogin_Click(object sender, EventArgs e)
@@ -75,10 +72,14 @@ namespace TechdriveLogin
 
             if (isValidUser)
             {
-                // Remember Me: save or clear username based on checkbox state
-                Properties.Settings.Default.RememberMe = cbRemeber.Checked;
-                Properties.Settings.Default.SavedUsername = cbRemeber.Checked ? inputUsername : "";
+                Properties.Settings.Default.RememberMe = false;
+                Properties.Settings.Default.SavedUsername = "";
                 Properties.Settings.Default.Save();
+
+                using (var loader = new LoadingForm())
+                {
+                    loader.ShowDialog(this);
+                }
 
                 // 1. CREATE the dashboard form
                 tdDashboard dashboard = new tdDashboard();
@@ -87,11 +88,7 @@ namespace TechdriveLogin
                 dashboard.FormClosed += (s, args) =>
                 {
                     this.Show();
-                    // If remember me is off, clear fields for next login
-                    if (!cbRemeber.Checked)
-                    {
-                        tbUsername.Text = "";
-                    }
+                    tbUsername.Text = "";
                     tbPassword.Text = "";
                     tbUsername.Focus();
                 };

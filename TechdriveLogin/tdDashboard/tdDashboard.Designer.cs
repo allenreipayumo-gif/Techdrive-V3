@@ -129,7 +129,7 @@ namespace TechdriveLogin
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(222, 25);
             this.label2.TabIndex = 1;
-            this.label2.Text = "Rei Payumo (Admin)";
+            this.label2.Text = "admin";
             // 
             // pictureBox1
             // 

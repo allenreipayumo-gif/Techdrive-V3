@@ -13,52 +13,110 @@ namespace TechdriveLogin
         public Reports()
         {
             InitializeComponent();
-            this.Load += (s, e) => LoadReportsData();
+            this.Load += (s, e) => {
+                if (this.panel7 != null)
+                {
+                    this.panel7.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+                }
+                LoadReportsData();
+            };
+        }
+
+        private void StyleDataGridView(DataGridView dgv)
+        {
+            dgv.BackgroundColor = Color.FromArgb(2, 36, 78);
+            dgv.ForeColor = Color.White;
+            dgv.GridColor = Color.FromArgb(29, 59, 172);
+            dgv.BorderStyle = BorderStyle.None;
+            dgv.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
+            dgv.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
+            
+            // Header styling
+            dgv.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(29, 59, 172);
+            dgv.ColumnHeadersDefaultCellStyle.ForeColor = Color.FromArgb(135, 226, 98);
+            dgv.ColumnHeadersDefaultCellStyle.Font = new Font("Century Gothic", 11F, FontStyle.Bold);
+            dgv.ColumnHeadersHeight = 40;
+            dgv.EnableHeadersVisualStyles = false;
+            
+            // Row styling
+            dgv.DefaultCellStyle.BackColor = Color.FromArgb(2, 36, 78);
+            dgv.DefaultCellStyle.ForeColor = Color.White;
+            dgv.DefaultCellStyle.Font = new Font("Century Gothic", 10F, FontStyle.Regular);
+            dgv.DefaultCellStyle.SelectionBackColor = Color.FromArgb(29, 59, 172);
+            dgv.DefaultCellStyle.SelectionForeColor = Color.White;
+            dgv.RowHeadersVisible = false;
+            dgv.RowTemplate.Height = 35;
+            
+            // Auto size and layout
+            dgv.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgv.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgv.AllowUserToAddRows = false;
+            dgv.AllowUserToDeleteRows = false;
+            dgv.AllowUserToResizeRows = false;
+            dgv.ReadOnly = true;
         }
 
         private void LoadReportsData()
         {
             try
             {
-                var reports = DatabaseHelper.GetVehicleReports(8);
-
-                Label[] vmLabels = { reportVMLbl1, reportVMLbl2, reportVMLbl3, reportVMLbl4, reportVMLbl5, reportVMLbl6, reportVMLbl7, reportVMLbl8 };
-                Label[] pnLabels = { reportPNLbl1, reportPNLbl2, reportPNLbl3, reportPNLbl4, reportPNLbl5, reportPNLbl6, reportPNLbl7, reportPNLbl8 };
-                Label[] lmdLabels = { lblLmd1, lblLmd2, lblLmd3, lblLmd4, lblLmd5, lblLmd6, lblLmd7, lblLmd8 };
-                Label[] tbtmLabels = { lblTBTM1, lblTBTM2, lblTBTM3, lblTBTM4, lblTBTM5, lblTBTM6, lblTBTM7, lblTBTM8 };
-                Label[] netLabels = { lblNetEarnings1, lblNetEarnings2, lblNetEarnings3, lblNetEarnings4, lblNetEarnings5, lblNetEarnings6, lblNetEarnings7, lblNetEarnings8 };
-
-                for (int i = 0; i < 8; i++)
+                // Clear static controls from panel7
+                panel7.Controls.Clear();
+                
+                // Create and style dynamic DataGridView
+                DataGridView dgv = new DataGridView();
+                dgv.Dock = DockStyle.Fill;
+                StyleDataGridView(dgv);
+                dgv.CellFormatting += Dgv_CellFormatting;
+                panel7.Controls.Add(dgv);
+                
+                // Fetch reports up to a limit of 100 for high scalability
+                var reports = DatabaseHelper.GetVehicleReports(100);
+                
+                // Create a DataTable to bind
+                DataTable dt = new DataTable();
+                dt.Columns.Add("Vehicle Model", typeof(string));
+                dt.Columns.Add("Plate Number", typeof(string));
+                dt.Columns.Add("Last Maintenance", typeof(string));
+                dt.Columns.Add("Total Bookings", typeof(int));
+                dt.Columns.Add("Net Earnings", typeof(string));
+                
+                foreach (var rep in reports)
                 {
-                    if (i < reports.Count)
-                    {
-                        var rep = reports[i];
-                        if (vmLabels[i] != null) vmLabels[i].Text = rep.VehicleModel;
-                        if (pnLabels[i] != null) pnLabels[i].Text = rep.PlateNumber;
-                        if (lmdLabels[i] != null) lmdLabels[i].Text = rep.LastMaintenance;
-                        if (tbtmLabels[i] != null) tbtmLabels[i].Text = rep.TotalTrips.ToString();
-                        if (netLabels[i] != null) netLabels[i].Text = $"₱{rep.NetEarnings:N2}";
-
-                        if (vmLabels[i] != null) vmLabels[i].Visible = true;
-                        if (pnLabels[i] != null) pnLabels[i].Visible = true;
-                        if (lmdLabels[i] != null) lmdLabels[i].Visible = true;
-                        if (tbtmLabels[i] != null) tbtmLabels[i].Visible = true;
-                        if (netLabels[i] != null) netLabels[i].Visible = true;
-                    }
-                    else
-                    {
-                        // Hide extra slots if we don't have enough data
-                        if (vmLabels[i] != null) vmLabels[i].Visible = false;
-                        if (pnLabels[i] != null) pnLabels[i].Visible = false;
-                        if (lmdLabels[i] != null) lmdLabels[i].Visible = false;
-                        if (tbtmLabels[i] != null) tbtmLabels[i].Visible = false;
-                        if (netLabels[i] != null) netLabels[i].Visible = false;
-                    }
+                    dt.Rows.Add(rep.VehicleModel, rep.PlateNumber, rep.LastMaintenance, rep.TotalTrips, $"₱{rep.NetEarnings:N2}");
                 }
+                
+                // Fetch dynamic monthly stats for bookings and net earnings
+                var monthlyStats = DatabaseHelper.GetMonthlyReportStats();
+                
+                // Append highlighted monthly summary rows
+                dt.Rows.Add("Total bookings this month", "", "", monthlyStats.totalBookings, "");
+                dt.Rows.Add("Net earnings for this month", "", "", DBNull.Value, $"₱{monthlyStats.netEarnings:N2}");
+                
+                dgv.DataSource = dt;
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Error loading report data: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void Dgv_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            if (sender is DataGridView dgv && e.RowIndex >= 0)
+            {
+                var modelVal = dgv.Rows[e.RowIndex].Cells["Vehicle Model"].Value;
+                if (modelVal != null)
+                {
+                    string modelText = modelVal.ToString();
+                    if (modelText == "Total bookings this month" || modelText == "Net earnings for this month")
+                    {
+                        // Accent highlight the summary rows in bold green with specialized corporate blue background
+                        e.CellStyle.BackColor = Color.FromArgb(29, 59, 172);
+                        e.CellStyle.ForeColor = Color.FromArgb(135, 226, 98);
+                        e.CellStyle.Font = new Font("Century Gothic", 10.5F, FontStyle.Bold);
+                    }
+                }
             }
         }
     }
