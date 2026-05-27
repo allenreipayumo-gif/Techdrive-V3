@@ -62,6 +62,13 @@ namespace TechdriveLogin
                     {
                         cmdExpiry.ExecuteNonQuery();
                     }
+
+                    // Resolve all old/stale alerts once on startup to allow the new 7-day rule and auto-resolution rules to calculate a clean fresh count!
+                    string resolveAllQuery = "UPDATE alerts SET is_resolved = TRUE WHERE is_resolved = FALSE;";
+                    using (var cmdResolveAll = new NpgsqlCommand(resolveAllQuery, conn))
+                    {
+                        cmdResolveAll.ExecuteNonQuery();
+                    }
                 }
             }
             catch (Exception)
