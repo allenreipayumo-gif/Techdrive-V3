@@ -227,110 +227,13 @@ namespace TechdriveLogin
             var activeAlertsList = new List<string>();
             try
             {
-                // First, fetch and prepend nearest vehicles ONLY if they are 7 days or shorter away, or overdue
+                // Fetch and prepend nearest vehicles ONLY if they are 7 days or shorter away, or overdue
                 var maintProximity = GetVehiclesMaintenanceProximity();
                 foreach (var v in maintProximity)
                 {
                     if (v.DaysLeftValue <= 7)
                     {
                         activeAlertsList.Add($"Maintenance Due: {v.ModelName} ({v.PlateNumber}) - {v.DaysLeftDetail}");
-                    }
-                }
-
-                using (var conn = GetConnection())
-                {
-                    // Clean up and auto-resolve ended booking alerts if booking is no longer Confirmed
-                    string resolveEndedAlertsQuery = @"
-                        UPDATE alerts 
-                        SET is_resolved = TRUE 
-                        FROM bookings b 
-                        WHERE alerts.description LIKE 'Warning: Rental period has ended for Booking #' || b.booking_id || '%' 
-                          AND b.status <> 'Confirmed';";
-
-                    using (var cmdResolveEnded = new NpgsqlCommand(resolveEndedAlertsQuery, conn))
-                    {
-                        cmdResolveEnded.ExecuteNonQuery();
-                    }
-
-                    // Clean up and auto-resolve payment alerts if payment reference is added or status is no longer Draft
-                    string resolvePaymentAlertsQuery = @"
-                        UPDATE alerts 
-                        SET is_resolved = TRUE 
-                        FROM bookings b 
-                        WHERE alerts.description LIKE 'Outstanding Payment: Booking #' || b.booking_id || '%' 
-                          AND (b.payments IS NOT NULL AND b.payments <> '' OR b.status <> 'Draft');";
-
-                    using (var cmdResolvePayment = new NpgsqlCommand(resolvePaymentAlertsQuery, conn))
-                    {
-                        cmdResolvePayment.ExecuteNonQuery();
-                    }
-
-                    // Transact/Query to auto-generate warning alerts for ended bookings
-                    string insertAlertsQuery = @"
-                        INSERT INTO alerts (vehicle_id, description, severity, due_date)
-                        SELECT 
-                            b.vehicle_id, 
-                            'Warning: Rental period has ended for Booking #' || CAST(b.booking_id AS VARCHAR) || ' (Customer: ' || b.customer_name || '). Vehicle is due for return.', 
-                            'High', 
-                            b.end_date
-                        FROM bookings b
-                        LEFT JOIN alerts a ON a.description LIKE '%Booking #' || CAST(b.booking_id AS VARCHAR) || '%'
-                        WHERE b.end_date <= CURRENT_DATE 
-                          AND b.status = 'Confirmed'
-                          AND a.alert_id IS NULL;";
-
-                    using (var cmdInsert = new NpgsqlCommand(insertAlertsQuery, conn))
-                    {
-                        cmdInsert.ExecuteNonQuery();
-                    }
-
-                    // Transact/Query to auto-generate maintenance alerts (due in less than 7 days, 3-month cycle)
-                    string insertMaintAlertsQuery = @"
-                        INSERT INTO alerts (vehicle_id, description, severity, due_date)
-                        SELECT 
-                            v.vehicle_id,
-                            'Maintenance Due: ' || v.make || ' ' || v.model || ' (Plate: ' || v.plate_number || ') is due for its 3-month routine maintenance check.',
-                            'Medium',
-                            (v.last_maintenance + INTERVAL '3 months')::DATE
-                        FROM vehicles v
-                        LEFT JOIN alerts a ON a.vehicle_id = v.vehicle_id AND a.description LIKE 'Maintenance Due:%' AND a.is_resolved = FALSE
-                        WHERE v.last_maintenance IS NOT NULL
-                          AND CURRENT_DATE >= (v.last_maintenance + INTERVAL '3 months' - INTERVAL '7 days')::DATE
-                          AND a.alert_id IS NULL;";
-
-                    using (var cmdInsertMaint = new NpgsqlCommand(insertMaintAlertsQuery, conn))
-                    {
-                        cmdInsertMaint.ExecuteNonQuery();
-                    }
-
-                    // Transact/Query to auto-generate outstanding payments alerts
-                    string insertPaymentAlertsQuery = @"
-                        INSERT INTO alerts (vehicle_id, description, severity, due_date)
-                        SELECT 
-                            b.vehicle_id, 
-                            'Outstanding Payment: Booking #' || CAST(b.booking_id AS VARCHAR) || ' (Customer: ' || b.customer_name || ') has no payment reference recorded.', 
-                            'Low', 
-                            b.booking_date
-                        FROM bookings b
-                        LEFT JOIN alerts a ON a.description LIKE '%Outstanding Payment: Booking #' || CAST(b.booking_id AS VARCHAR) || '%'
-                        WHERE b.status = 'Draft' 
-                          AND (b.payments IS NULL OR b.payments = '')
-                          AND a.alert_id IS NULL;";
-
-                    using (var cmdInsertPayment = new NpgsqlCommand(insertPaymentAlertsQuery, conn))
-                    {
-                        cmdInsertPayment.ExecuteNonQuery();
-                    }
-
-                    // Query to fetch all unresolved active warnings (excluding static maintenance alerts to prevent duplication)
-                    string fetchAlertsQuery = "SELECT description FROM alerts WHERE is_resolved = FALSE AND description NOT LIKE 'Maintenance Due:%' ORDER BY created_at DESC;";
-                    using (var cmdFetch = new NpgsqlCommand(fetchAlertsQuery, conn))
-                    using (var reader = cmdFetch.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            activeAlertsList.Add(reader.GetString(0));
-                        }
                     }
                 }
             }
