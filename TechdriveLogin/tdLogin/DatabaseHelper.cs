@@ -220,16 +220,44 @@ namespace TechdriveLogin
             var activeAlertsList = new List<string>();
             try
             {
-                // First, fetch and prepend the top 3 nearest to their next maintenance date vehicles (ordered by proximity)
+                // First, fetch and prepend nearest vehicles ONLY if they are 7 days or shorter away, or overdue
                 var maintProximity = GetVehiclesMaintenanceProximity();
-                for (int i = 0; i < 3 && i < maintProximity.Count; i++)
+                foreach (var v in maintProximity)
                 {
-                    var v = maintProximity[i];
-                    activeAlertsList.Add($"Maintenance Due: {v.ModelName} ({v.PlateNumber}) - {v.DaysLeftDetail}");
+                    if (v.DaysLeftValue <= 7)
+                    {
+                        activeAlertsList.Add($"Maintenance Due: {v.ModelName} ({v.PlateNumber}) - {v.DaysLeftDetail}");
+                    }
                 }
 
                 using (var conn = GetConnection())
                 {
+                    // Clean up and auto-resolve ended booking alerts if booking is no longer Confirmed
+                    string resolveEndedAlertsQuery = @"
+                        UPDATE alerts 
+                        SET is_resolved = TRUE 
+                        FROM bookings b 
+                        WHERE alerts.description LIKE 'Warning: Rental period has ended for Booking #' || b.booking_id || '%' 
+                          AND b.status <> 'Confirmed';";
+
+                    using (var cmdResolveEnded = new NpgsqlCommand(resolveEndedAlertsQuery, conn))
+                    {
+                        cmdResolveEnded.ExecuteNonQuery();
+                    }
+
+                    // Clean up and auto-resolve payment alerts if payment reference is added or status is no longer Draft
+                    string resolvePaymentAlertsQuery = @"
+                        UPDATE alerts 
+                        SET is_resolved = TRUE 
+                        FROM bookings b 
+                        WHERE alerts.description LIKE 'Outstanding Payment: Booking #' || b.booking_id || '%' 
+                          AND (b.payments IS NOT NULL AND b.payments <> '' OR b.status <> 'Draft');";
+
+                    using (var cmdResolvePayment = new NpgsqlCommand(resolvePaymentAlertsQuery, conn))
+                    {
+                        cmdResolvePayment.ExecuteNonQuery();
+                    }
+
                     // Transact/Query to auto-generate warning alerts for ended bookings
                     string insertAlertsQuery = @"
                         INSERT INTO alerts (vehicle_id, description, severity, due_date)
